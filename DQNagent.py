@@ -79,9 +79,9 @@ for run in range(1000):
                 buy_price = prices[t]
                 n_shares += n_buy
                 # reward -= transaction_fee * n_buy
-                reward = n_buy * (prices[t-1] - prices[t] - transaction_fee)
+                reward += n_buy * (prices[t-1] - prices[t] - transaction_fee)
         elif action == 2: # hold
-            reward = n_shares * (prices[t] - prices[t-1] + transaction_fee)
+            reward += n_shares * (prices[t] - prices[t-1] + transaction_fee)
         elif action == 1: # sell
             if n_shares > 0:
                 n_sell = random.randint(1, n_shares)
@@ -89,7 +89,7 @@ for run in range(1000):
                 n_shares -= n_sell
                 # reward += (prices[t]- buy_price) * n_shares - transaction_fee
                 # n_shares = 0
-                reward = n_sell * (prices[t] - buy_price - transaction_fee)
+                reward += n_sell * (prices[t] - buy_price - transaction_fee)
         # else:
              
 

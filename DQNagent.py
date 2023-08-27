@@ -5,6 +5,7 @@ from keras.layers import LSTM, Dense
 from collections import deque
 import time
 import matplotlib.pyplot as plt
+import random
 
 # Load data from CSV file
 data = pd.read_csv('msft_days_data.csv')
@@ -55,9 +56,10 @@ def train_model():
         target_f = model.predict(state,verbose=None)
         target_f[0][action] = target
         model.fit(state, target_f, epochs=1, verbose=0)
+df = pd.DataFrame(columns=['epos','score'])
 
 scores = []
-for run in range(100):
+for run in range(1000):
     start_time = time.time()
     # Play the game for one episode
     for t in range(len(prices)-1):
@@ -77,11 +79,17 @@ for run in range(100):
                 buy_price = prices[t]
                 n_shares += n_buy
                 # reward -= transaction_fee * n_buy
+                reward = n_buy * (prices[t-1] - prices[t] - transaction_fee)
+        elif action == 2: # hold
+            reward = n_shares * (prices[t] - prices[t-1] + transaction_fee)
         elif action == 1: # sell
             if n_shares > 0:
-                cash += n_shares * (prices[t] - transaction_fee)
+                n_sell = random.randint(1, n_shares)
+                cash += n_sell * (prices[t] - transaction_fee)
+                n_shares -= n_sell
                 # reward += (prices[t]- buy_price) * n_shares - transaction_fee
-                n_shares = 0
+                # n_shares = 0
+                reward = n_sell * (prices[t] - buy_price - transaction_fee)
         # else:
              
 
@@ -95,8 +103,8 @@ for run in range(100):
         # Train DRQN model on a batch of experiences
         train_model()
 
-        if time.time() - start_time >= 20: # training time limit of 5 minutes (300 seconds)
-            break
+        # if time.time() - start_time >= 2: # training time limit of 5 minutes (300 seconds)
+        #     break
 
     # Print final game score and asset values after each run 
     score = cash + n_shares * prices[-1]

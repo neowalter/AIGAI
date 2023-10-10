@@ -1,2 +1,2 @@
 # AIGAI
-Unleash the fully potential of AI
+Unleash the full potential of AI
